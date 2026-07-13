@@ -7,7 +7,7 @@
 		"render": "remotion render src/index.ts intro out/intro.mp4 --crf 26",
 		"poster": "remotion still src/index.ts intro out/poster.jpg --frame 780",
 		"check": "tsc --noEmit",
-		"test": "node --test 'scripts/**/*.test.mjs'"
+		"test": "node --test \"scripts/**/*.test.mjs\""
 	},
 	"dependencies": {
 		"@remotion/cli": "4.0.486",

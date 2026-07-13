@@ -21,7 +21,8 @@ npm run render   # out/intro.mp4
 
 Three files to edit, in order:
 
-1. **`src/intro/brand.ts`** — wordmark, tagline, logo path, optional soundtrack.
+1. **`src/intro/brand.ts`** — wordmark, tagline, logo path, optional soundtrack. Keep the
+   wordmark short (~10 characters) or reduce the lockup font size in `src/intro/Lockup.tsx`.
 2. **`src/intro/sequence.ts`** — the storyboard. A typed array of beats
    (`boot`, `card`, `still`, `strobe`, `lockup`) with frame timings. Rewrite
    the copy; retime or reorder beats freely — the composition duration is
