@@ -17,13 +17,19 @@
 - Repo root: `/Users/mills/Desktop/Projects/remotion-eva-template` (git already initialized on `main`, spec committed).
 - Exact version pins, no `^`/`~`: `remotion@4.0.486`, `@remotion/cli@4.0.486`, `react@19.2.7`, `react-dom@19.2.7`, `@types/react@19.2.17`, `typescript@6.0.3`, `sharp@0.35.3`.
 - Ship only OFL fonts (Press Start 2P, VT323, Orbitron) with their OFL license text. Never commit Tr2n, VCR OSD Mono, or any audio.
-- No personal content anywhere: no "mills", "millsymills", UNIFI/Protonmail/Unraid/Gandi copy, or personal image assets.
+- No personal content in template code, assets, README, or CI: no "mills", "millsymills", UNIFI/Protonmail/Unraid/Gandi copy, or personal image assets. Exception: `docs/superpowers/` (the template's own spec/plan) may reference the source project, and the GitHub org name `millsmillsymills` appears in README URLs and LICENSE.
 - README must NOT claim `npx create-video --template` support (it doesn't exist for community repos).
 - "Evangelion-inspired" in prose only; no NGE assets.
 - Composition: id `intro`, 1920×1080 @ 30fps, duration derived via `totalFrames()`.
 - Code style: tabs (match source project), 100-char lines, comments only for non-obvious constraints.
 - Source files to port live at `/Users/mills/Desktop/Projects/millsymills.com/video/` (read-only — never modify that repo).
-- Commit after every task; commit messages end with `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
+- Commit after every task; every commit message ends with the trailer shown in each commit step.
+
+## Subagent execution notes
+
+- Tasks are strictly sequential (each depends on the previous); all subagents work directly in the repo root. No worktrees — the parallel-subagent worktree rule doesn't apply to sequential dispatch.
+- Every task dispatch must include this header + Global Constraints + the task text.
+- Visual checks are phrased as still-frame extraction so a worker can verify by Reading the image files.
 
 ---
 
@@ -147,7 +153,9 @@ Expected: install completes; `check` exits 0 (no src yet — tsc checks `remotio
 
 ```bash
 git add -A
-git commit -m "feat: scaffold remotion workspace with textures and OFL fonts"
+git commit -m "feat: scaffold remotion workspace with textures and OFL fonts
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -373,7 +381,9 @@ Expected: seven PNGs written; cutout is `1080x1350 alpha: true`, still is `1920x
 
 ```bash
 git add scripts assets/cutouts assets/stills assets/logos
-git commit -m "feat: duotone treatment script and generated placeholder assets"
+git commit -m "feat: duotone treatment script and generated placeholder assets
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -573,7 +583,9 @@ Expected: exit 0.
 
 ```bash
 git add src
-git commit -m "feat: core intro modules — palette, crt grammar, brand config, storyboard"
+git commit -m "feat: core intro modules — palette, crt grammar, brand config, storyboard
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -772,13 +784,21 @@ npx remotion render src/index.ts intro out/smoke.mp4 --frames=0-9
 npx remotion still src/index.ts intro out/lockup-check.jpg --frame 780
 ```
 
-Expected: check exits 0; both renders succeed. Open `out/lockup-check.jpg` and confirm: logo, `ACME` wordmark in Orbitron with cyan glow, `> example.com` tagline, rays + grid visible. Open `out/smoke.mp4` and confirm the boot typewriter renders in VT323.
+Expected: check exits 0; both renders succeed. Then extract a boot frame and inspect both stills with the Read tool:
+
+```bash
+npx remotion still src/index.ts intro out/boot-check.jpg --frame 60
+```
+
+Read `out/lockup-check.jpg` — confirm logo, `ACME` wordmark in Orbitron (wide geometric caps, NOT blocky pixel glyphs) with cyan glow, `> example.com` tagline, rays + grid visible. Read `out/boot-check.jpg` — confirm the phosphor-green typewriter line in VT323 (tall narrow terminal glyphs) over the grid floor.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add src
-git commit -m "feat: beat components and renderable intro composition"
+git commit -m "feat: beat components and renderable intro composition
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -837,13 +857,15 @@ actionlint .github/workflows/ci.yml
 zizmor .github/workflows/ci.yml
 ```
 
-Expected: both clean (zizmor may note `cache: npm` cache poisoning as informational on public repos — acceptable for a read-only-permissions workflow; fix anything above informational).
+Both tools are installed on this machine; if a command is missing, install with `brew install actionlint zizmor`. Expected: both clean (zizmor may note `cache: npm` cache poisoning as informational on public repos — acceptable for a read-only-permissions workflow; fix anything above informational).
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add .github
-git commit -m "ci: typecheck, script tests, render smoke on SHA-pinned actions"
+git commit -m "ci: typecheck, script tests, render smoke on SHA-pinned actions
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -866,7 +888,16 @@ mkdir -p docs
 cp out/poster.jpg docs/poster.jpg
 ```
 
-Expected: `out/intro.mp4` (30s, 900 frames, silent) renders without error; poster copied. Watch the mp4 once end-to-end: boot → cards/stills alternation → strobe → notice → lockup, no missing images, no font fallbacks (Orbitron wordmark must not look like Press Start 2P).
+Expected: `out/intro.mp4` (30s, 900 frames, silent) renders without error; poster copied. Verify programmatically, then spot-check frames with the Read tool:
+
+```bash
+ffprobe -v error -show_entries format=duration -of csv=p=0 out/intro.mp4
+for f in 40 82 120 230 330 530 600 780; do
+  npx remotion still src/index.ts intro "out/frame-$f.jpg" --frame "$f"
+done
+```
+
+Expected duration: `30.0` (±0.1). Read each `out/frame-*.jpg`: 40 = boot typewriter, 82 = magenta cutout still, 120 = TRANSMISSION 01 card, 230 = full-frame cyan still, 330 = UNIT-02 card, 530 = strobe cutout, 600 = red NOTICE card, 780 = lockup. Every frame must show its placeholder art (no black/missing images) and the lockup wordmark must be Orbitron (wide geometric caps), not a pixel-font fallback.
 
 - [ ] **Step 2: Write LICENSE**
 
@@ -898,7 +929,9 @@ SOFTWARE.
 
 - [ ] **Step 3: Write README.md**
 
-```markdown
+The entire fenced block below (4-backtick fence) is the verbatim file content:
+
+````markdown
 # remotion-eva-template
 
 An Evangelion-inspired title sequence as a [Remotion](https://www.remotion.dev/)
@@ -983,13 +1016,15 @@ family in the component.
 
 Code, textures, and placeholder images: [MIT](LICENSE). Fonts: SIL Open Font
 License (see `assets/fonts/*-OFL.txt`).
-```
+````
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add README.md LICENSE docs/poster.jpg
-git commit -m "docs: README, MIT license, hero poster"
+git commit -m "docs: README, MIT license, hero poster
+
+Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
 ---
@@ -1024,18 +1059,22 @@ Expected: `is_template: true` with the topics listed. If `--template` isn't a va
 
 - [ ] **Step 3: Confirm CI is green**
 
+`gh run watch` without a run id prompts interactively — resolve the id first:
+
 ```bash
-gh run watch --repo millsmillsymills/remotion-eva-template --exit-status
+repo=millsmillsymills/remotion-eva-template
+run_id=$(gh run list --repo "$repo" --branch main --limit 1 --json databaseId --jq '.[0].databaseId')
+gh run watch "$run_id" --repo "$repo" --exit-status
 ```
 
-Expected: the push-triggered CI run passes. If it fails, fix locally, commit, push, re-watch — do not proceed until green.
+Expected: the push-triggered CI run passes (exit 0). If the run hasn't appeared yet, wait a few seconds and re-run the `gh run list` line. If CI fails, fix locally, commit, push, re-watch — do not proceed until green.
 
 - [ ] **Step 4: Fresh-clone dry run**
 
-In the session scratchpad directory (not /tmp):
+In your session scratchpad directory (the absolute path given in your context as "Scratchpad Directory" — not /tmp):
 
 ```bash
-cd "$SCRATCHPAD"
+cd <scratchpad-directory>
 git clone --depth 1 https://github.com/millsmillsymills/remotion-eva-template fresh-clone
 cd fresh-clone
 npm install
@@ -1048,7 +1087,7 @@ Expected: all succeed with no `track.mp3` present (silent render path) and no re
 - [ ] **Step 5: Verify no personal/licensed content leaked**
 
 ```bash
-rg -i "mills|unifi|protonmail|unraid|gandi|tr2n|vcr" --hidden -g '!.git' .
+rg -i "mills|unifi|protonmail|unraid|gandi|tr2n|vcr" --hidden -g '!.git' -g '!docs/superpowers' .
 ```
 
-Run from the fresh clone. Expected: no matches (the GitHub org name in README clone URLs and LICENSE copyright is the only acceptable `millsmillsymills` hit — confirm each match is one of those).
+Run from the fresh clone. `docs/superpowers/` is excluded — the template's own spec/plan legitimately reference the source project. Expected matches, all of which are acceptable: the org name `millsmillsymills` in README clone URLs and the LICENSE copyright line. Anything else (personal copy, UNIFI/Protonmail/Unraid/Gandi text, Tr2n/VCR font references) is a leak — fix it, commit, push before finishing.
