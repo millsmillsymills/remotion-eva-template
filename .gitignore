@@ -1,0 +1,6 @@
+.superpowers/
+node_modules/
+out/
+# a drop-in soundtrack is usually not yours to redistribute; remove this rule
+# only if your track is
+assets/track.mp3
