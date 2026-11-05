@@ -9,13 +9,22 @@ seconds, 1920×1080 @ 30fps.
 
 ## Quickstart
 
+Use Node.js 22 or later (CI uses Node 22; the dependency refresh was also tested
+on Node 24). Rendering on macOS requires macOS 15 or later; see Remotion's
+[system requirements](https://www.remotion.dev/docs/#system-requirements) for
+supported Linux environments and required system packages.
+
 Click **Use this template** on GitHub (or `npx degit millsmillsymills/remotion-eva-template my-intro`), then:
 
 ```bash
-npm install
+npm ci
 npm run studio   # live preview
 npm run render   # out/intro.mp4
 ```
+
+Before sharing changes, run `npm run check`, `npm test`, and `npm audit`.
+The CI render smoke test is
+`npx remotion render src/index.ts intro out/smoke.mp4 --frames=0-9`.
 
 ## Make it yours
 
