@@ -10,14 +10,14 @@
 		"test": "node --test \"scripts/**/*.test.mjs\""
 	},
 	"dependencies": {
-		"@remotion/cli": "4.0.486",
+		"@remotion/cli": "4.0.540",
 		"react": "19.2.7",
 		"react-dom": "19.2.7",
-		"remotion": "4.0.486"
+		"remotion": "4.0.540"
 	},
 	"devDependencies": {
 		"@types/react": "19.2.17",
-		"sharp": "0.35.3",
+		"sharp": "0.35.5",
 		"typescript": "6.0.3"
 	}
 }
