@@ -9,7 +9,7 @@ seconds, 1920×1080 @ 30fps.
 
 ## Quickstart
 
-Use Node.js 22 or later (CI uses Node 22; the dependency refresh was also tested
+Use Node.js 22.12.0 or later (CI uses Node 22; the dependency refresh was also tested
 on Node 24). Rendering on macOS requires macOS 15 or later; see Remotion's
 [system requirements](https://www.remotion.dev/docs/#system-requirements) for
 supported Linux environments and required system packages.
